@@ -64,13 +64,7 @@ A aplicação inicia corretamente e possui separação suficiente entre entrada 
 
 Representar os dados necessários do bilhete definidos pelo contrato.
 
-O modelo deve suportar os estados:
-
-```text
-aberto
-fechado
-cancelado
-```
+O modelo deve suportar os estados `aberto`, `fechado` e `cancelado`.
 
 Deve permitir representar, quando aplicável:
 
@@ -119,12 +113,7 @@ Validar a placa conforme o contrato:
 * somente caracteres alfanuméricos;
 * formato em maiúsculas.
 
-Entradas inválidas devem produzir:
-
-```text
-422
-placa_invalida
-```
+Entradas inválidas devem produzir HTTP `422` com o identificador de erro `placa_invalida`.
 
 **Critério de conclusão:**
 
@@ -142,16 +131,9 @@ Quando informado:
 * deve possuir timezone;
 * deve ser interpretável como timestamp válido.
 
-Quando não informado:
+Quando não informado, utilizar o instante atual conforme contrato.
 
-* utilizar o instante atual conforme contrato.
-
-Entrada inválida deve produzir:
-
-```text
-422
-entrada_invalida
-```
+Entrada inválida deve produzir HTTP `422` com o identificador de erro `entrada_invalida`.
 
 ---
 
@@ -159,26 +141,10 @@ entrada_invalida
 
 Garantir que:
 
-1. formato da requisição seja validado;
+1. o formato da requisição seja validado;
 2. somente depois sejam verificadas regras de negócio e conflitos.
 
-Exemplo:
-
-```text
-placa inválida + placa já possui bilhete aberto
-```
-
-deve resultar em:
-
-```text
-422 placa_invalida
-```
-
-e não em:
-
-```text
-409 bilhete_em_aberto
-```
+Exemplo: uma placa inválida que também possui bilhete aberto deve resultar em `422 placa_invalida`, e não em `409 bilhete_em_aberto`.
 
 ---
 
@@ -196,11 +162,7 @@ Com entrada válida:
 * iniciar status como `aberto`;
 * retornar o resultado conforme contrato.
 
-Resposta de sucesso:
-
-```text
-201
-```
+A resposta de sucesso deve utilizar HTTP `201`.
 
 ---
 
@@ -211,12 +173,7 @@ Antes de criar um novo bilhete:
 * verificar se já existe bilhete `aberto` para a placa;
 * se existir, rejeitar a operação.
 
-Erro:
-
-```text
-409
-bilhete_em_aberto
-```
+O erro deve utilizar HTTP `409` e o identificador `bilhete_em_aberto`.
 
 Após encerramento ou cancelamento, a placa pode possuir novo bilhete aberto.
 
@@ -228,12 +185,7 @@ Após encerramento ou cancelamento, a placa pode possuir novo bilhete aberto.
 
 Permitir localizar bilhetes pelo identificador.
 
-Quando o ID não existir:
-
-```text
-404
-bilhete_nao_encontrado
-```
+Quando o ID não existir, retornar HTTP `404` com o identificador `bilhete_nao_encontrado`.
 
 ---
 
@@ -250,12 +202,7 @@ Ao encerrar:
 
 Não permitir encerramento de bilhete já fechado.
 
-Nesse caso:
-
-```text
-409
-bilhete_ja_encerrado
-```
+Nesse caso, utilizar HTTP `409` com o identificador `bilhete_ja_encerrado`.
 
 Qualquer outro conflito de estado deve utilizar somente o comportamento definido pelo contrato.
 
@@ -265,28 +212,20 @@ Qualquer outro conflito de estado deve utilizar somente o comportamento definido
 
 ## TASK-12 — Implementar cálculo de duração
 
-Calcular:
+Calcular a duração utilizando a diferença entre o timestamp de saída e o timestamp de entrada.
 
-```text
-duração = saída - entrada
-```
-
-A duração deve ser calculada utilizando timestamps reais.
+O cálculo deve utilizar timestamps reais.
 
 ---
 
 ## TASK-13 — Implementar tolerância
 
-Aplicar:
-
-```text
-TOLERANCIA_MINUTOS = 0
-```
+Aplicar `TOLERANCIA_MINUTOS = 0`.
 
 Com essa variante:
 
-* duração `0` → sem cobrança;
-* duração maior que `0` → cobrança normal.
+* duração de `0` minutos resulta em cobrança sem valor;
+* duração maior que `0` minutos segue o cálculo normal.
 
 Não subtrair a tolerância da duração antes do cálculo das frações.
 
@@ -294,63 +233,43 @@ Não subtrair a tolerância da duração antes do cálculo das frações.
 
 ## TASK-14 — Implementar cálculo de frações
 
-Utilizar:
+Utilizar `ceil(duração_em_minutos / 30)` para determinar a quantidade de frações.
 
-```text
-frações = ceil(duração_em_minutos / 30)
-```
+As principais fronteiras obrigatórias são:
 
-Exemplos obrigatórios:
-
-| Duração | Frações |
-| ------: | ------: |
-|   0 min |       0 |
-|   1 min |       1 |
-|  29 min |       1 |
-|  30 min |       1 |
-|  31 min |       2 |
-|  59 min |       2 |
-|  60 min |       2 |
-|  61 min |       3 |
-|  90 min |       3 |
-|  91 min |       4 |
+* 0 minutos → 0 frações;
+* 1 minuto → 1 fração;
+* 29 minutos → 1 fração;
+* 30 minutos → 1 fração;
+* 31 minutos → 2 frações;
+* 59 minutos → 2 frações;
+* 60 minutos → 2 frações;
+* 61 minutos → 3 frações;
+* 90 minutos → 3 frações;
+* 91 minutos → 4 frações.
 
 ---
 
 ## TASK-15 — Implementar valor por fração
 
-A tarifa da variante é:
+A tarifa da variante é `600` centavos por hora.
 
-```text
-600 centavos/hora
-```
+Como cada fração representa 30 minutos, o valor de cada fração é `300` centavos.
 
-Como a fração é de 30 minutos:
-
-```text
-valor da fração = 300 centavos
-```
-
-Os cálculos devem utilizar inteiros.
+Os cálculos monetários devem utilizar números inteiros.
 
 ---
 
 ## TASK-16 — Implementar teto da cobrança
 
-Aplicar:
+Aplicar o teto de `5000` centavos ao valor final da cobrança.
 
-```text
-valor_final = min(valor_bruto, 5000)
-```
+Verificar obrigatoriamente que:
 
-Verificar obrigatoriamente:
+* 16 frações resultam em `4800` centavos;
+* 17 frações resultam em `5000` centavos.
 
-```text
-16 frações → 4800
-17 frações → 5000
-```
-
-Valores acima do teto continuam limitados a `5000` centavos.
+Valores acima do teto devem permanecer limitados a `5000` centavos.
 
 ---
 
@@ -358,21 +277,13 @@ Valores acima do teto continuam limitados a `5000` centavos.
 
 ## TASK-17 — Implementar listagem de bilhetes abertos
 
-Retornar somente bilhetes com status:
-
-```text
-aberto
-```
+Retornar somente bilhetes com status `aberto`.
 
 Ordenar do mais novo para o mais antigo.
 
-A ordenação deve utilizar informação temporal, e não depender da numeração do ID.
+A ordenação deve utilizar informação temporal e não depender da numeração do ID.
 
-Quando não houver bilhetes abertos:
-
-```json
-[]
-```
+Quando não houver bilhetes abertos, retornar uma lista vazia.
 
 ---
 
@@ -382,11 +293,7 @@ Quando não houver bilhetes abertos:
 
 Permitir cancelamento somente de bilhete aberto.
 
-Ao cancelar:
-
-```text
-status = cancelado
-```
+Ao cancelar, alterar o status para `cancelado`.
 
 Bilhete cancelado não deve gerar cobrança.
 
@@ -394,19 +301,9 @@ Bilhete cancelado não deve gerar cobrança.
 
 ## TASK-19 — Implementar erros de cancelamento
 
-ID inexistente:
+Quando o ID não existir, retornar HTTP `404` com o identificador `bilhete_nao_encontrado`.
 
-```text
-404
-bilhete_nao_encontrado
-```
-
-Bilhete que não está aberto:
-
-```text
-409
-bilhete_nao_aberto
-```
+Quando o bilhete não estiver aberto, retornar HTTP `409` com o identificador `bilhete_nao_aberto`.
 
 Não criar identificadores de erro adicionais sem previsão contratual.
 
@@ -420,17 +317,13 @@ Consultar os bilhetes associados a uma placa.
 
 O histórico deve incluir os estados previstos:
 
-* aberto;
-* fechado;
-* cancelado.
+* `aberto`;
+* `fechado`;
+* `cancelado`.
 
 Ordenar do mais novo para o mais antigo.
 
-Quando não houver histórico:
-
-```json
-[]
-```
+Quando não houver histórico, retornar uma lista vazia.
 
 ---
 
@@ -461,13 +354,7 @@ Para `tempo_medio_minutos`:
 * calcular a média conforme contrato;
 * aplicar arredondamento half-up.
 
-Exemplos:
-
-```text
-10,4 → 10
-10,5 → 11
-10,6 → 11
-```
+Os exemplos de arredondamento são: `10,4` resulta em `10`, `10,5` resulta em `11` e `10,6` resulta em `11`.
 
 ---
 
@@ -526,29 +413,15 @@ Cobrir:
 
 ## TASK-27 — Implementar testes de cobrança
 
-Cobrir todas as fronteiras:
+Cobrir as principais fronteiras de duração:
 
-```text
-0
-1
-29
-30
-31
-59
-60
-61
-90
-91
-```
+`0`, `1`, `29`, `30`, `31`, `59`, `60`, `61`, `90` e `91` minutos.
 
 Também cobrir:
 
-```text
-16 frações = 4800
-17 frações = 5000
-```
-
-e valores superiores ao teto.
+* 16 frações resultando em `4800` centavos;
+* 17 frações resultando em `5000` centavos;
+* valores superiores ao teto.
 
 ---
 
@@ -597,13 +470,9 @@ Validar:
 
 ## TASK-31 — Configurar porta
 
-Configurar a aplicação para utilizar:
+Configurar a aplicação para utilizar a porta `8005`.
 
-```text
-8005
-```
-
-A porta não deve ficar fixada em `8080` quando o ambiente da prova exigir `8005`.
+A porta não deve permanecer fixada em `8080` quando o ambiente da prova exigir `8005`.
 
 ---
 
@@ -659,7 +528,7 @@ Verificar:
 
 ## TASK-36 — Revisar casos de borda
 
-Executar/revisar principalmente:
+Executar ou revisar principalmente:
 
 * 0 minutos;
 * 1 minuto;
@@ -674,7 +543,7 @@ Executar/revisar principalmente:
 * 16 frações;
 * 17 frações;
 * placa duplicada;
-* placa inválida + conflito;
+* placa inválida com conflito;
 * bilhete inexistente;
 * bilhete já encerrado;
 * bilhete cancelado;
@@ -701,22 +570,15 @@ Garantir que:
 
 Garantir que:
 
-* listagem de abertos seja do mais novo para o mais antigo;
-* histórico seja do mais novo para o mais antigo;
-* ordenação não dependa exclusivamente do ID.
+* a listagem de abertos seja do mais novo para o mais antigo;
+* o histórico seja do mais novo para o mais antigo;
+* a ordenação não dependa exclusivamente do ID.
 
 ---
 
 ## TASK-39 — Revisar estados
 
-Confirmar que:
-
-```text
-aberto → fechado
-aberto → cancelado
-```
-
-são as transições válidas previstas.
+Confirmar que as transições `aberto → fechado` e `aberto → cancelado` são as transições válidas previstas.
 
 Confirmar também que:
 
@@ -748,36 +610,6 @@ Antes de finalizar:
 
 A sequência recomendada é:
 
-```text
-TASK-01
-   ↓
-TASK-02
-   ↓
-TASK-03 / TASK-04
-   ↓
-TASK-05 / TASK-06 / TASK-07
-   ↓
-TASK-08 / TASK-09
-   ↓
-TASK-10 / TASK-11
-   ↓
-TASK-12 → TASK-16
-   ↓
-TASK-17
-   ↓
-TASK-18 / TASK-19
-   ↓
-TASK-20
-   ↓
-TASK-21 → TASK-23
-   ↓
-TASK-24
-   ↓
-TASK-25 → TASK-30
-   ↓
-TASK-31 → TASK-34
-   ↓
-TASK-35 → TASK-40
-```
+`TASK-01 → TASK-02 → TASK-03/TASK-04 → TASK-05/TASK-06/TASK-07 → TASK-08/TASK-09 → TASK-10/TASK-11 → TASK-12 a TASK-16 → TASK-17 → TASK-18/TASK-19 → TASK-20 → TASK-21 a TASK-23 → TASK-24 → TASK-25 a TASK-30 → TASK-31 a TASK-34 → TASK-35 a TASK-40`.
 
 A ordem não obriga uma tecnologia específica. O objetivo é reduzir ambiguidades e garantir que cada requisito seja implementado e validado antes da revisão final.
