@@ -2,9 +2,9 @@
 
 # ALUNO
 
-Nome: SophyazonaToperson64
+Nome: Andrei Luiz Silva
 
-RA: >>> PREENCHER <<<
+RA: 230874732
 
 Conta GitHub: @SophyazonaToperson64
 
