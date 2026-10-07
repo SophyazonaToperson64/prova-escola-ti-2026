@@ -16,7 +16,7 @@
 
 | # | URL | O que foi consultado | Onde aparece no entregável |
 | --- | --- | --- | --- |
-| — | | | |
+| — | |Nenhum site consultado. | |
 
 *(Ex.: `https://docs.oracle.com/...` → sintaxe de `Optional` → `plan.md` na
 seção de decisões. Esse link é ILUSTRATIVO — fora de linha numerada não
@@ -38,7 +38,8 @@ conta. Se nenhum site foi consultado, escreva: **"Nenhum site consultado."**)*
 
 | # | Link público da conversa | Onde o conteúdo foi usado |
 | --- | --- | --- |
-| — | | |
+| — | https://chatgpt.com/share/6ac2b7e6-0f48-83e9-9bc7-8e6a8cb51f57 | Prova01Carreira 01Zona AzulDigital |
+| — | https://chatgpt.com/share/6ac6d275-ed44-83e9-9727-014ecf5e5f5b | Prova01Carreira 01Zona AzulDigital |
 
 *(Se nenhuma IA foi utilizada, escreva: **"Nenhuma IA utilizada."**)*
 
