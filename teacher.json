@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "repo": "prova-escola-ti-2026",
+  "repo_url": "https://github.com/SophyazonaToperson64/prova-escola-ti-2026",
+  "exam_dir": "exams/2026/track-01-especificacao-sdd",
+  "track": "track-01-especificacao-sdd",
+  "issue": 1,
+  "issue_url": "https://github.com/SophyazonaToperson64/prova-escola-ti-2026/issues/1",
+  "gerado_em": "2026-10-08T00:01:25+00:00",
+  "fechada_em": "2026-10-08T00:00:42Z",
+  "aplicada": true,
+  "motivo": null,
+  "aluno": {
+    "login": "SophyazonaToperson64",
+    "ra": "230874732",
+    "nome": "Andrei Luiz Silva"
+  },
+  "variante": {
+    "slug": "prova-escola-ti-2026",
+    "EXAM_DIR": "exams/2026/track-01-especificacao-sdd",
+    "TARIFA_HORA_CENTAVOS": 600,
+    "FRACAO_MINUTOS": 30,
+    "TETO_DIARIO_CENTAVOS": 5000,
+    "PORTA_SERVICO": 8005,
+    "TOLERANCIA_MINUTOS": 0
+  },
+  "janela": {
+    "minutos": 120,
+    "t0": "2026-10-07T22:26:05Z",
+    "ultimo_push": "2026-10-07T21:00:01-03:00"
+  },
+  "commits": {
+    "total": 5,
+    "autores": [
+      "Andrei Silva",
+      "SophyazonaToperson64"
+    ],
+    "primeiro": "2026-10-07T19:17:20-03:00",
+    "ultimo": "2026-10-07T21:00:01-03:00",
+    "fora_da_janela": 0
+  },
+  "nota_parcial": {
+    "valor": null,
+    "criterios": {}
+  },
+  "auto_correcao": {
+    "executada": true,
+    "nota_ultima": 15
+  },
+  "fontes": {
+    "presente": true,
+    "declarou_vazio": false,
+    "links": 0
+  }
+}
